@@ -4,7 +4,7 @@ import csv
 import re
 import time
 
-print('\n[ AS24 SCRAPER 1.0.1 by rickorso ]')
+print('\n[ AS24 SCRAPER 1.0.0 by rickorso ]')
 print('Inizializzazione...')
 time.sleep(1.0)
 
