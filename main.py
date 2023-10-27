@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 import csv
 import re
-import time
 
 # FUNCTIONS
 
@@ -19,9 +18,8 @@ def replace_hybrid(data):
 
 # START
 
-print('\n[ AS24 SCRAPER v0.1.0 by rickorso ]')
+print('\n[ AS24 SCRAPER v0.1.1 by rickorso ]')
 print('Inizializzazione...')
-time.sleep(1.0)
 
 # chiedo l'url e ricavo il numero della pagina
 base_url = input("\nInserisci l'URL della pagina desiderata su AutoScout24: ")
@@ -68,10 +66,8 @@ for page_number in range(1, page_counter+1):
             print(f'Pagina ({page_number})')
         else:
             print('\nAcquisizione link...\n')
-            time.sleep(0.5)
             print('Link acquisito correttamente.\n')
             print('Inizio acquisizione dati...\n')
-            time.sleep(0.5)
             print(f'Pagina ({page_number})')
 
     # Verifica che la richiesta abbia avuto successo
@@ -84,7 +80,7 @@ for page_number in range(1, page_counter+1):
 
         for annuncio in soup.find_all('article', class_='cldt-summary-full-item listing-impressions-tracking list-page-item false ListItem_article__ppamD'):
             link = annuncio.find('a', class_='ListItem_title__znV2I ListItem_title_new_design__lYiAv Link_link__pjU1l').get('href')
-            link = 'https://www.autoscout24.it' + link
+            link = '=COLLEG.IPERTESTUALE(' + '"https://www.autoscout24.it' + link + '"' + '; "LINK"' + ')'
             vers = annuncio.find('a', class_='ListItem_title__znV2I ListItem_title_new_design__lYiAv Link_link__pjU1l').find('h2')
             vers = vers.find('span', class_='ListItem_version__jNjur')
             vers = vers.text.strip()
