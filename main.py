@@ -4,24 +4,10 @@ import csv
 import re
 import time
 
-print('\n[ AS24 SCRAPER v0.1.0 by rickorso ]')
-print('Inizializzazione...')
-time.sleep(1.0)
+# FUNCTIONS
 
-# Crea una funzione per aggiungere il parametro &page=1 dopo &desc=numero
-def add_page_param(url):
-    # Cerca il parametro &desc=numero nell'URL
-    match = re.search(r'&desc=\d+', url)
-    
-    if match:
-        # Estrai la parte dell'URL prima del parametro &desc=numero
-        prefix = url.split(match.group())[0]
-        
-        # Aggiungi il parametro &page=1
-        return f"{prefix}&page=1{match.group()}"
-    else:
-        # Se il parametro &desc=numero non è presente, restituisci l'URL originale
-        return url
+def add_page_param(base_url):
+    return base_url+'&page=1'
 
 # Crea una funzione per sostituire i dati mancanti e quelli con "-"
 def replace_missing(data):
@@ -31,32 +17,33 @@ def replace_missing(data):
 def replace_hybrid(data):
     return ["Ibrida" if "Elettrica/Benzina" in item or "Elettrica/Diesel" in item else item for item in data]
 
-# Richiedi all'utente di inserire l'URL della prima pagina di ricerca su AutoScout24
+# START
+
+print('\n[ AS24 SCRAPER v0.1.0 by rickorso ]')
+print('Inizializzazione...')
+time.sleep(1.0)
+
+# chiedo l'url e ricavo il numero della pagina
 base_url = input("\nInserisci l'URL della pagina desiderata su AutoScout24: ")
-
-# Aggiungi il parametro &page=1 se necessario
-base_url = add_page_param(base_url)
-
-# Definisci un'espressione regolare per cercare il parametro &page= con un numero qualsiasi
 pattern = r'&page=\d+'
 
-# Estrai il valore corrente del parametro &page=
 match = re.search(pattern, base_url)
 
-if match:
-        current_page = match.group()
-        page_number = int(current_page.split('=')[1])  # Estrai il numero dalla stringa
-        if page_number > 1:     # Se la pagina rilevata è maggiore di 1, essa viene riportata a 1 in modo da ricominciare da capo
-            page_number = 1
-        url = re.sub(pattern, f'&page={page_number}', base_url)  # Sostituisci il numero di pagina
+# Aggiungi il parametro &page=1 se necessario
+if not match:
+    base_url = add_page_param(base_url)
+    match = re.search(pattern, base_url)
 
-# Crea una lista per salvare tutti gli annunci da tutte le pagine
+# Se la pagina rilevata è maggiore di 1, essa viene riportata a 1 in modo da ricominciare da capo
+current_page = match.group()
+page_number = int(current_page.split('=')[1])
+if page_number > 1:
+    page_number = 1
+url = re.sub(pattern, f'&page={page_number}', base_url)
+
+# tiro giù la pagina
 annunci_totali = []
-
-# Effettua la richiesta GET
 response = requests.get(url)
-
-# Parsa il contenuto HTML della pagina
 soup = BeautifulSoup(response.content, 'html.parser')
 
 page_counter = int(soup.find('div', class_='ListPage_pagination__v_4ci').find_all('button', class_='FilteredListPagination_button__41hHM')[-2].get_text())
@@ -151,7 +138,6 @@ filename = filename + '.csv'
 
 # Esporta i dati in un file CSV
 while True:
-
     try:
         with open(filename, 'w', newline='') as file_csv:
             print(f'\nScrittura in corso su file "{filename}"...')
